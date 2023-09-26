@@ -1,35 +1,11 @@
 from copy import deepcopy
 from typing import Dict, Union
-from datetime import date
 
-from models import Manager, Developer, PullRequest
+from .base_simulator import BaseSimulator
+from models import Developer, PullRequest
 
 
-class ChRev:
-    _manager: Manager
-
-    def __init__(self, manager: Manager):
-        self._manager = manager
-
-    @staticmethod
-    def calc_diff_date(start, end):
-        start_date = date.fromisoformat(start)
-        end_date = date.fromisoformat(end)
-        return (end_date - start_date).days
-
-    @staticmethod
-    def get_max_date(data_list):
-        return max(data_list, key=lambda c: c.date).date
-
-    @staticmethod
-    def get_min_date(data_list):
-        return min(data_list, key=lambda c: c.date).date
-
-    @staticmethod
-    def obj_time_is_between_prs(obj, prev_pr: Union[PullRequest, None], pr: PullRequest):
-        if prev_pr is None:
-            return obj.date <= pr.date
-        return prev_pr.date <= obj.date <= pr.date
+class ChRev(BaseSimulator):
 
     def _calc_xFactor(
             self,
