@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from .pull_request import PullRequest
 from .comment import Comment
 from .file import File
 from .developer import Developer
@@ -11,12 +12,14 @@ class Manager:
     developers: Dict[str, Developer]
     contributions: Dict[str, List[Contribution]]
     comments: Dict[str, List[Comment]]
+    pull_requests: Dict[int, PullRequest]
 
     def __init__(self):
         self.files = {}
         self.developers = {}
         self.contributions = {}
         self.comments = {}
+        self.pull_requests = {}
 
     @property
     def developers_list(self):
@@ -29,6 +32,10 @@ class Manager:
     @property
     def comments_list(self):
         return list(self.comments.values())
+
+    @property
+    def pull_requests_list(self):
+        return list(self.pull_requests.values())
 
     def add_comment(self, comment: Comment):
         k = comment.filename
@@ -47,3 +54,6 @@ class Manager:
         if k not in self.contributions:
             self.contributions[k] = []
         self.contributions[k].append(contribution)
+
+    def add_pull_request(self, pr: PullRequest):
+        self.pull_requests[pr.number] = pr

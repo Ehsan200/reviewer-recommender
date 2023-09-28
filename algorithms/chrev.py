@@ -1,42 +1,35 @@
-from typing import Dict
-from datetime import datetime, date
+from copy import deepcopy
+from typing import Dict, Union
 
-from models import Manager, Developer, PullRequest
+from .base_simulator import BaseSimulator
+from models import Developer, PullRequest
 
 
-class ChRev:
-    _manager: Manager
-    # {[username]: { [filepath]: score }}
-    _scores: Dict[str, Dict[str, float]]
+class ChRev(BaseSimulator):
 
-    def __init__(self, manager: Manager):
-        self._manager = manager
-
-    @staticmethod
-    def calc_diff_date(start, end):
-        start_date = date.fromisoformat(start)
-        end_date = date.fromisoformat(end)
-        return (end_date - start_date).days
-
-    @staticmethod
-    def get_max_date(data_list):
-        return max(data_list, key=lambda c: c.date).date
-
-    @staticmethod
-    def get_min_date(data_list):
-        return min(data_list, key=lambda c: c.date).date
-
-    def _calc_xFactor(self, developer: Developer) -> Dict[str, float]:
+    def _calc_xFactor(
+            self,
+            developer: Developer,
+            pr: PullRequest,
+            prev_pr: Union[PullRequest, None],
+    ) -> Dict[str, float]:
         file_scores = {}
         for file in self._manager.files_list:
+            if file not in pr.file_paths:
+                continue
             score = 0
             all_file_comments = self._manager.comments[file.filepath]
-            developer_comments = [_ for _ in all_file_comments if _.reviewer_username == developer.username]
+            developer_comments = [
+                _ for _ in all_file_comments if
+                _.reviewer_username == developer.username and self.obj_time_is_between_prs(_, prev_pr=prev_pr, pr=pr)
+            ]
             score += len(developer_comments) / len(all_file_comments)
 
             all_file_contributions = self._manager.contributions[file.filepath]
-            all_developer_contributions = [_ for _ in all_file_contributions if _.username == developer.username]
-
+            all_developer_contributions = [
+                _ for _ in all_file_contributions if
+                _.username == developer.username and self.obj_time_is_between_prs(_, prev_pr=prev_pr, pr=pr)
+            ]
             total_most_recent_comment_date = self.get_max_date(all_file_contributions)
             developer_most_recent_comment_date = self.get_max_date(all_developer_contributions)
 
@@ -61,11 +54,25 @@ class ChRev:
 
         return file_scores
 
-    # todo: implement
-    def calc_score_for_pr(self, pr: PullRequest):
-        # check
-        pass
+    def simulate(self):
+        # {[pr_number]: { [dev_username]: score }}
+        result: Dict[int, Dict[str, float]] = {}
+        # {[username]: { [filepath]: score }}
+        scores: Dict[str, Dict[str, float]] = {}
 
-    def exec(self):
-        for developer in self._manager.developers_list:
-            self._scores[developer.username] = self._calc_xFactor(developer=developer)
+        prev_pr = None
+        for pr in self._manager.pull_requests_list:
+            result[pr.number] = {}
+            for developer in self._manager.developers_list:
+                dev_scores = self._calc_xFactor(developer=developer, pr=pr, prev_pr=prev_pr)
+                if developer.username not in scores:
+                    scores[developer.username] = deepcopy(dev_scores)
+                else:
+                    for filepath, score in dev_scores.items():
+                        if filepath not in scores[developer.username]:
+                            scores[developer.username][filepath] = score
+                        else:
+                            scores[developer.username][filepath] += score
+                result[pr.number][developer.username] = sum(list(scores[developer.username].values()))
+            prev_pr = pr
+        return result
