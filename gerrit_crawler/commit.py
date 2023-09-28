@@ -41,3 +41,5 @@ def fetch_revisions():
         fetch_commits(project_url, revision_ids, information)
         write_results(PROJECT_NAMES[project_url], information, 'Revision')
 
+if __name__ == '__main__':
+    fetch_revisions()
