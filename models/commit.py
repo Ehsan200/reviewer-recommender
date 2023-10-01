@@ -2,8 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Contribution:
-    filename: str
+class Commit:
+    id: str
     username: str
-    commit_id: str
     date: str

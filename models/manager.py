@@ -1,18 +1,27 @@
 from typing import Dict, List
 
+from . import Commit
 from .pull_request import PullRequest
 from .comment import Comment
 from .file import File
 from .developer import Developer
 from .contribution import Contribution
+from .review import Review
+from .review_file import ReviewFile
 
 
+
+
+# todo: complete
 class Manager:
     files: Dict[str, File]
     developers: Dict[str, Developer]
     contributions: Dict[str, List[Contribution]]
     comments: Dict[str, List[Comment]]
     pull_requests: Dict[int, PullRequest]
+    reviews: Dict[str, Review]
+    review_files: Dict[str, ReviewFile]
+    commits: Dict[str, Commit]
 
     def __init__(self):
         self.files = {}
@@ -20,6 +29,9 @@ class Manager:
         self.contributions = {}
         self.comments = {}
         self.pull_requests = {}
+        self.commits = {}
+        self.reviews = {}
+        self.review_files = {}
 
     @property
     def developers_list(self):
@@ -36,6 +48,18 @@ class Manager:
     @property
     def pull_requests_list(self):
         return list(self.pull_requests.values())
+
+    @property
+    def reviews_list(self):
+        return list(self.reviews.values())
+
+    @property
+    def commits_list(self):
+        return list(self.commits.values())
+
+    @property
+    def review_files_list(self):
+        return list(self.review_files.values())
 
     def add_comment(self, comment: Comment):
         k = comment.filename

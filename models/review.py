@@ -2,9 +2,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Comment:
-    id: str
-    filename: str
+class Review:
+    id: int
     reviewer_username: str
+    commit_id: str
+    pull_number: int
     date: str
-    review_id: int

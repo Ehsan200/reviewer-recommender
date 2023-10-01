@@ -4,3 +4,4 @@ from .contribution import Contribution
 from .comment import Comment
 from .file import File
 from .pull_request import PullRequest
+from .commit import Commit
