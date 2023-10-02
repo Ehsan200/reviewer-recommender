@@ -15,7 +15,7 @@ class BaseSimulator:
     def calc_diff_date(start, end):
         start_date = date.fromisoformat(start)
         end_date = date.fromisoformat(end)
-        return (end_date - start_date).days
+        return abs((end_date - start_date).days)
 
     @staticmethod
     def get_max_date(data_list):
