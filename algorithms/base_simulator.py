@@ -12,10 +12,14 @@ class BaseSimulator:
         self._manager = manager
 
     @staticmethod
-    def calc_diff_date(start, end):
+    def calc_diff_date(start: str, end: str):
         start_date = date.fromisoformat(start)
         end_date = date.fromisoformat(end)
         return abs((end_date - start_date).days)
+
+    @staticmethod
+    def get_date_month(date_str: str):
+        return date.fromisoformat(date_str).month
 
     @staticmethod
     def get_max_date(data_list):

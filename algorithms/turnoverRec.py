@@ -6,40 +6,25 @@ from .base_simulator import BaseSimulator
 
 class TurnoverRec(BaseSimulator):
     def _calc_ReviewerKnows(self, developer: Developer, pr: PullRequest):
-        # {[int: review_id]: [float: score]}
-        res: Dict[int, float] = {}
-        all_reviews = [_ for _ in self._manager.reviews_list if _.pull_number == pr.number]
-        all_review_files = [_ for _ in self._manager.review_files_list if _.pull_number == pr.number]
+        files_paths = [
+            _.filepath for _ in self._manager.review_files_list if
+            _.filepath in pr.file_paths and _.reviewer_username == developer.username and pr.date > _.date
+        ]
 
-        for review in all_reviews:
-            review_files = [_ for _ in all_review_files if _.review_id == review.id]
-            review_files_paths = [_.filepath for _ in review_files]
+        for filepath in pr.file_paths:
+            all_file_contributions = self._manager.contributions[filepath]
+            if len([
+                _ for _ in all_file_contributions if
+                _.username == developer.username and pr.date > _.date and _.filename == filepath
+                # last condition is trivial
+            ]) > 0:
+                files_paths.append(filepath)
 
-            previous_reviews = [
-                _ for _ in self._manager.reviews_list if
-                review.date > _.date and _.reviewer_username == developer.username
-            ]
-            previous_reviews_ids = [_.id for _ in previous_reviews]
-            previous_review_files = [
-                _ for _ in self._manager.review_files_list if
-                _.review_id in previous_reviews_ids and _.filepath in review_files_paths
-            ]
-
-            previous_commits = [
-                _ for _ in self._manager.commits_list
-                if _.username == developer.username and review.date > _.date
-            ]
-
-            res[review.id] = (len(previous_review_files) + len(previous_commits)) / len(review_files)
-
-        return res
+        return len(set(files_paths)) / len(pr.file_paths)
 
     def _calc_learnRec(self, developer: Developer, pr: PullRequest):
         # todo: check with article
-        final_res: Dict[int, float] = {}
-        for review_id, score in self._calc_ReviewerKnows(developer=developer, pr=pr).items():
-            final_res[review_id] = 1 - (1 / score)
-        return final_res
+        return 1 - self._calc_ReviewerKnows(developer=developer, pr=pr)
 
     def _is_diff_under_year(self, f_date, e_date):
         return self.calc_diff_date(f_date, e_date) <= 365
@@ -51,21 +36,40 @@ class TurnoverRec(BaseSimulator):
             _ for _ in self._manager.commits_list if self._is_diff_under_year(pr.date, _.date)
         ])
 
-    def _calc_contributionRatio(self, pr: PullRequest):
-        result: Dict[str, float] = {}
+    def _calc_RetentionRec(self, pr: PullRequest):
+        # {[dev_username]: float}
+        retention: Dict[str, float] = {}
         totalCommitReviews = self._calc_totalCommitReview(pr=pr)
 
         for developer in self._manager.developers_list:
-            result[developer.username] = len([
+            past_year_reviews = [
                 _ for _ in self._manager.reviews_list
                 if self._is_diff_under_year(pr.date, _.date) and _.reviewer_username == developer.username
-            ]) + len([
+            ]
+            past_year_commits = [
                 _ for _ in self._manager.commits_list
                 if self._is_diff_under_year(pr.date, _.date) and _.reviewer_username == developer.username
-            ]) / totalCommitReviews
+            ]
+            contribution = len(past_year_reviews) + len(past_year_commits) / totalCommitReviews
+            past_year_active_months = {
+                *[self.get_date_month(_.date) for _ in past_year_reviews],
+                *[self.get_date_month(_.date) for _ in past_year_commits],
+            }
+            consistency = len(past_year_active_months) / 12
+            retention[developer.username] = contribution * consistency
 
-        return result
+        return retention
 
     def simulate(self):
-        # todo: implement
-        pass
+        # {[pr_number]: { [dev_username]: score }}
+        result: Dict[int, Dict[str, float]] = {}
+
+        for pr in self._manager.pull_requests_list:
+            result[pr.number] = {}
+            retentionRec = self._calc_RetentionRec(pr=pr)
+            for developer in self._manager.developers_list:
+                # TurnoverRec
+                result[pr.number][developer.username] = self._calc_learnRec(
+                    developer=developer,
+                    pr=pr) * retentionRec[developer.username]
+        return result
