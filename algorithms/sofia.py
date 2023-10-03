@@ -46,7 +46,11 @@ class Sofia(BaseSimulator):
         for pr in self._manager.pull_requests_list:
             result[pr.number] = {}
             knowledgeable = self._calc_knowledgeable(pr=pr)
+            knowledgeable_list = list(knowledgeable.values())
             for developer in self._manager.developers_list:
-                pass
+                if all(len(_) >= self._d for _ in knowledgeable_list):
+                    result[pr.number][developer.username] = chRev_result[pr.number][developer.username]
+                else:
+                    result[pr.number][developer.username] = turnoverRec_result[pr.number][developer.username]
 
         return result
