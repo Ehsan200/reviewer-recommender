@@ -7,7 +7,6 @@ from .chrev import ChRev
 from .turnoverRec import TurnoverRec
 
 
-# todo: implement
 class Sofia(BaseSimulator):
     _d = 2
 
