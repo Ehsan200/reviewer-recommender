@@ -15,7 +15,7 @@ class ChRev(BaseSimulator):
     ) -> Dict[str, float]:
         file_scores = {}
         for file in self._manager.files_list:
-            if file not in pr.file_paths:
+            if file.filepath not in pr.file_paths:
                 continue
             score = 0
             all_file_comments = self._manager.comments[file.filepath]
