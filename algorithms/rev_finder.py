@@ -39,9 +39,7 @@ class RevFinder(BaseSimulator):
                             methodology=methodology,
                         )
                 scores[methodology] /= (len(new_files) * len(review_files))
-                old_code_reviewers = review.reviewer_login
-                for code_reviewer in old_code_reviewers:
-                    candidates[methodology][code_reviewer] += scores[methodology]
+                candidates[methodology][review.reviewer_login] += scores[methodology]
 
         return candidates
 
