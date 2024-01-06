@@ -16,7 +16,12 @@ class ProjectFilesSimilarity:
         return methodology(f1, f2) / max(len(f1), len(f2))
 
     def calculate_scores(self):
-        combinations_files = list(combinations(self._manager.files_list, 2))
+        combinations_files = list(
+            combinations(
+                [_.filepath for _ in self._manager.files_list],
+                2,
+            )
+        )
         for f1, f2 in combinations_files:
             for methodology in METHODOLOGIES:
                 score = self._get_file_path_similarity(f1, f2, methodology)

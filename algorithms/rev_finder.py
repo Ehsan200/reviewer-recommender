@@ -27,19 +27,23 @@ class RevFinder(BaseSimulator):
         for review in past_reviews:
 
             review_files = [
-                _.filepath for _ in self._manager.review_files_list if _.review_id == review.id
+                filepath for _ in self._manager.pull_requests_list if
+                _.number == review.pull_number for filepath in _.file_paths
             ]
+            if len(review_files) == 0 or len(new_files) == 0:
+                continue
 
             for methodology in METHODOLOGIES:
+                methodology_name = methodology.__name__
                 for new_file in new_files:
                     for file in review_files:
-                        scores[methodology] += self.file_similarity.get_file_similarity(
+                        scores[methodology_name] += self.file_similarity.get_file_similarity(
                             f1=file,
                             f2=new_file,
                             methodology=methodology,
                         )
-                scores[methodology] /= (len(new_files) * len(review_files))
-                candidates[methodology][review.reviewer_login] += scores[methodology]
+                scores[methodology_name] /= (len(new_files) * len(review_files))
+                candidates[methodology_name][review.reviewer_username] += scores[methodology_name]
 
         return candidates
 

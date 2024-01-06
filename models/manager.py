@@ -1,6 +1,7 @@
+from functools import cached_property
 from typing import Dict, List
 
-from . import Commit
+from .commit import Commit
 from .pull_request import PullRequest
 from .comment import Comment
 from .file import File
@@ -10,8 +11,6 @@ from .review import Review
 from .review_file import ReviewFile
 
 
-
-
 # todo: complete
 class Manager:
     files: Dict[str, File]
@@ -19,8 +18,8 @@ class Manager:
     contributions: Dict[str, List[Contribution]]
     comments: Dict[str, List[Comment]]
     pull_requests: Dict[int, PullRequest]
-    reviews: Dict[str, Review]
-    review_files: Dict[str, ReviewFile]
+    reviews: Dict[int, Review]
+    review_files: List[ReviewFile]
     commits: Dict[str, Commit]
 
     def __init__(self):
@@ -31,35 +30,35 @@ class Manager:
         self.pull_requests = {}
         self.commits = {}
         self.reviews = {}
-        self.review_files = {}
+        self.review_files = []
 
-    @property
+    @cached_property
     def developers_list(self):
         return list(self.developers.values())
 
-    @property
+    @cached_property
     def files_list(self):
         return list(self.files.values())
 
-    @property
+    @cached_property
     def comments_list(self):
-        return list(self.comments.values())
+        return list(comment for file_comments in self.comments.values() for comment in file_comments)
 
-    @property
+    @cached_property
     def pull_requests_list(self):
         return list(self.pull_requests.values())
 
-    @property
+    @cached_property
     def reviews_list(self):
         return list(self.reviews.values())
 
-    @property
+    @cached_property
     def commits_list(self):
         return list(self.commits.values())
 
-    @property
+    @cached_property
     def review_files_list(self):
-        return list(self.review_files.values())
+        return list(self.review_files)
 
     def add_comment(self, comment: Comment):
         k = comment.filename
@@ -81,3 +80,12 @@ class Manager:
 
     def add_pull_request(self, pr: PullRequest):
         self.pull_requests[pr.number] = pr
+
+    def add_commit(self, commit: Commit):
+        self.commits[commit.id] = commit
+
+    def add_review(self, review: Review):
+        self.reviews[review.id] = review
+
+    def add_review_file(self, review_file: ReviewFile):
+        self.review_files.append(review_file)
