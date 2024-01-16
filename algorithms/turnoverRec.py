@@ -1,6 +1,7 @@
 from typing import Dict
 
 from models import Developer, PullRequest
+from utils import Cache
 from .base_simulator import BaseSimulator
 
 
@@ -11,7 +12,13 @@ class TurnoverRec(BaseSimulator):
             _.filepath in pr.file_paths and _.reviewer_username == developer.username and pr.date > _.date
         ]
 
+        if len(files_paths) == 0:
+            return 0
+
         for filepath in pr.file_paths:
+            if filepath not in self._manager.contributions.keys():
+                continue
+
             all_file_contributions = self._manager.contributions[filepath]
             if len([
                 _ for _ in all_file_contributions if
@@ -48,7 +55,7 @@ class TurnoverRec(BaseSimulator):
             ]
             past_year_commits = [
                 _ for _ in self._manager.commits_list
-                if self._is_diff_under_year(pr.date, _.date) and _.reviewer_username == developer.username
+                if self._is_diff_under_year(pr.date, _.date) and _.username == developer.username
             ]
             contribution = len(past_year_reviews) + len(past_year_commits) / totalCommitReviews
             past_year_active_months = {
@@ -61,6 +68,9 @@ class TurnoverRec(BaseSimulator):
         return retention
 
     def simulate(self):
+        if self.cached_result:
+            return self.cached_result
+
         # {[pr_number]: { [dev_username]: score }}
         result: Dict[int, Dict[str, float]] = {}
 
@@ -71,5 +81,8 @@ class TurnoverRec(BaseSimulator):
                 # TurnoverRec
                 result[pr.number][developer.username] = self._calc_learnRec(
                     developer=developer,
-                    pr=pr) * retentionRec[developer.username]
+                    pr=pr
+                ) * retentionRec[developer.username]
+
+        Cache.store(self._cache_filename, result)
         return result

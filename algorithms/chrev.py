@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Dict, Union
 
+from utils import Cache
 from .base_simulator import BaseSimulator
 from models import Developer, PullRequest
 
@@ -15,7 +16,7 @@ class ChRev(BaseSimulator):
     ) -> Dict[str, float]:
         file_scores = {}
         for file in self._manager.files_list:
-            if file.filepath not in pr.file_paths:
+            if file.filepath not in pr.file_paths or file.filepath not in self._manager.comments.keys():
                 continue
             score = 0
             all_file_comments = self._manager.comments[file.filepath]
@@ -30,6 +31,10 @@ class ChRev(BaseSimulator):
                 _ for _ in all_file_contributions if
                 _.username == developer.username and self.obj_time_is_between_prs(_, prev_pr=prev_pr, pr=pr)
             ]
+
+            if len(all_developer_contributions) == 0 or len(all_file_contributions) == 0:
+                continue
+
             total_most_recent_comment_date = self.get_max_date(all_file_contributions)
             developer_most_recent_comment_date = self.get_max_date(all_developer_contributions)
 
@@ -42,19 +47,23 @@ class ChRev(BaseSimulator):
                 developer_most_recent_comment_date,
             )
 
-            score += (developer_diff / total_diff)
+            score += (developer_diff / total_diff) if total_diff else 1
 
-            score += 1 / (
-                    self.calc_diff_date(
-                        total_most_recent_comment_date,
-                        developer_most_recent_comment_date,
-                    ) + 1)
+            diff_date = self.calc_diff_date(
+                total_most_recent_comment_date,
+                developer_most_recent_comment_date,
+            )
+
+            score += 1 / (diff_date + 1)
 
             file_scores[file.filepath] = score
 
         return file_scores
 
     def simulate(self):
+        if self.cached_result:
+            return self.cached_result
+
         # {[pr_number]: { [dev_username]: score }}
         result: Dict[int, Dict[str, float]] = {}
         # {[username]: { [filepath]: score }}
@@ -75,4 +84,6 @@ class ChRev(BaseSimulator):
                             scores[developer.username][filepath] += score
                 result[pr.number][developer.username] = sum(list(scores[developer.username].values()))
             prev_pr = pr
+
+        Cache.store(self._cache_filename, result)
         return result

@@ -2,6 +2,7 @@ from functools import cached_property
 from typing import Dict, Set
 
 from models import PullRequest
+from utils import Cache
 from .base_simulator import BaseSimulator
 from .chrev import ChRev
 from .turnoverRec import TurnoverRec
@@ -12,15 +13,18 @@ class Sofia(BaseSimulator):
 
     @cached_property
     def _chRev_simulator(self):
-        return ChRev(self._manager)
+        return ChRev(self._manager, from_cache=self._from_cache)
 
     @cached_property
     def _turnoverRec_simulator(self):
-        return TurnoverRec(self._manager)
+        return TurnoverRec(self._manager, from_cache=self._from_cache)
 
     def _calc_knowledgeable(self, pr: PullRequest):
         result: Dict[str, Set[str]] = {}
         for filepath in pr.file_paths:
+            if filepath not in self._manager.contributions.keys():
+                continue
+
             files_reviewer_username = [
                 _.reviewer_username for _ in self._manager.review_files_list if
                 filepath == _.filepath and pr.date > _.date
@@ -36,6 +40,9 @@ class Sofia(BaseSimulator):
         return result
 
     def simulate(self):
+        if self.cached_result:
+            return self.cached_result
+
         chRev_result = self._chRev_simulator.simulate()
         turnoverRec_result = self._turnoverRec_simulator.simulate()
 
@@ -52,4 +59,5 @@ class Sofia(BaseSimulator):
                 else:
                     result[pr.number][developer.username] = turnoverRec_result[pr.number][developer.username]
 
+        Cache.store(self._cache_filename, result)
         return result

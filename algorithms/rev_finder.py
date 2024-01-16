@@ -3,15 +3,16 @@ from collections import defaultdict
 from typing import Dict, List
 
 from models import PullRequest, Manager
+from utils import Cache
 from .base_simulator import BaseSimulator
 from .utils.rev_finder import ProjectFilesSimilarity, METHODOLOGIES
 
 
 class RevFinder(BaseSimulator):
 
-    def __init__(self, manager: Manager):
-        super().__init__(manager)
-        self.file_similarity = ProjectFilesSimilarity(self._manager)
+    def __init__(self, manager: Manager, from_cache=True):
+        super().__init__(manager, from_cache)
+        self.file_similarity = ProjectFilesSimilarity(self._manager, from_cache=self._from_cache)
 
     def calc_candidates_with_methodologies(self, pr: PullRequest):
 
@@ -59,6 +60,9 @@ class RevFinder(BaseSimulator):
         return res
 
     def simulate(self):
+        if self.cached_result:
+            return self.cached_result
+
         self.file_similarity.calculate_scores()
 
         # {[pr_number]: { [dev_username]: user_rank }}
@@ -79,4 +83,5 @@ class RevFinder(BaseSimulator):
                 for candidate_username in all_unique_candidates_usernames
             }
 
+        Cache.store(self._cache_filename, result)
         return result
