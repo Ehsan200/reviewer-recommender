@@ -3,6 +3,7 @@ import argparse
 from algorithms import Sofia, RevFinder, ChRev, TurnoverRec
 from utils import ManagerFactory
 from const import DATA_BASE_DIR
+from utils.logger import info_logger
 
 parser = argparse.ArgumentParser(description='Run algorithms on a GitHub project.')
 parser.add_argument(
@@ -27,6 +28,7 @@ def run_algorithm(algorithm, args):
     if not DATA_BASE_DIR:
         raise Exception('DATA_BASE_DIR is not set.')
 
+    info_logger.info(f'algorithm {args.algorithm} for project={args.r_owner[0]}/{args.r_name[0]} started')
     manager = ManagerFactory(
         DATA_BASE_DIR,
         f'{args.r_owner[0]}-{args.r_name[0]}',

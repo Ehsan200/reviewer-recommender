@@ -61,7 +61,18 @@ The data fetched by the `Github-crawler` is stored in the `crawled-data` directo
 
 The `DATA_BASE_DIR` environment variable should be set to the path of the `crawled-data` directory. This allows the algorithms in this project to access the fetched data.
 
-[//]: # (todo: add more info about the data storage and algorithms results)
+## Logs
+
+During the execution of the algorithms, logs are generated to provide some information about the process.
+
+The logs are stored in the `logs` directory in the root of this repository.
+
+The logs include information such as:
+
+- Start and end time of each algorithm execution.
+- Steps and decisions made by the algorithms.
+
+To view the logs, navigate to the `logs` directory and open the desired log file. You can use any text editor to view the contents of the log files.
 
 ## Authors
 

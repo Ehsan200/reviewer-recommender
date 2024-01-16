@@ -1,5 +1,6 @@
 from models import PullRequest, Comment, Review, Commit, Developer, Contribution, File, ReviewFile
 from .data_loader import DataLoader
+from .logger import info_logger
 
 
 class DataConverter:
@@ -135,6 +136,16 @@ class DataConverter:
                             date=raw_review['submitted_at'],
                         )
                     )
+
+        info_logger.info(f'Number of commits: {len(all_converted_commits)}')
+        info_logger.info(f'Number of developers: {len(all_converted_developers)}')
+        info_logger.info(f'Number of contributions: {len(all_converted_contributions)}')
+        info_logger.info(f'Number of files: {len(all_converted_files)}')
+        info_logger.info(f'Number of comments: {len(all_converted_comments)}')
+        info_logger.info(f'Number of reviews: {len(all_converted_reviews)}')
+        info_logger.info(f'Number of pull requests: {len(all_converted_prs)}')
+        info_logger.info(f'Number of review files: {len(all_converted_review_files)}')
+
 
         return dict(
             commits=all_converted_commits,

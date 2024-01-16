@@ -4,6 +4,7 @@ from typing import Dict, List
 
 from models import PullRequest, Manager
 from utils import Cache
+from utils.logger import info_logger
 from .base_simulator import BaseSimulator
 from .utils.rev_finder import ProjectFilesSimilarity, METHODOLOGIES
 
@@ -60,7 +61,9 @@ class RevFinder(BaseSimulator):
         return res
 
     def simulate(self):
+        info_logger.info("Simulating RevFinder...")
         if self.cached_result:
+            info_logger.info("Simulating RevFinder loaded from cache")
             return self.cached_result
 
         self.file_similarity.calculate_scores()
@@ -68,7 +71,9 @@ class RevFinder(BaseSimulator):
         # {[pr_number]: { [dev_username]: user_rank }}
         result: Dict[int, Dict[str, float]] = {}
 
+        pr_len = len(self._manager.pull_requests_list)
         for pr in self._manager.pull_requests_list:
+            info_logger.info(f'Calculating candidates for PR {pr.number}/{pr_len}')
             candidates_per_methodology = list(self.calc_candidates_with_methodologies(pr=pr).values())
 
             # todo: refactor
@@ -84,4 +89,5 @@ class RevFinder(BaseSimulator):
             }
 
         Cache.store(self._cache_filename, result)
+        info_logger.info("Simulating RevFinder stored in cache")
         return result

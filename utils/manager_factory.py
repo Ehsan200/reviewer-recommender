@@ -1,6 +1,7 @@
 from models import Manager
 from .cache import Cache
 from .data_converter import DataConverter
+from .logger import info_logger
 
 
 class ManagerFactory:
@@ -16,6 +17,7 @@ class ManagerFactory:
         if self._from_cache:
             cached_manager = Cache.load(self._cache_file_name)
             if cached_manager is not None:
+                info_logger.info('Manager loaded from cache')
                 return cached_manager
 
         manager = Manager(self._project_name)
@@ -39,7 +41,10 @@ class ManagerFactory:
         for review_file in converted_data['review_files']:
             manager.add_review_file(review_file)
 
+        info_logger.info('Manager created')
+
         Cache.store(self._cache_file_name, manager)
+        info_logger.info('Manager stored in cache')
         return manager
 
     @property

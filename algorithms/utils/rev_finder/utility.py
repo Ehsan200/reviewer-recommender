@@ -4,6 +4,7 @@ from itertools import combinations
 
 from models import Manager
 from utils import Cache
+from utils.logger import info_logger
 from .string_compare import METHODOLOGIES
 
 
@@ -29,6 +30,7 @@ class ProjectFilesSimilarity:
     def calculate_scores(self):
         if self._from_cache and self._cached_scores:
             self._scores = self._cached_scores
+            info_logger.info('File similarity scores loaded from cache')
             return
 
         combinations_files = list(
@@ -37,6 +39,8 @@ class ProjectFilesSimilarity:
                 2,
             )
         )
+        info_logger.info('Combinations files calculated')
+        info_logger.info('File similarity scores calculating...')
 
         for index, (f1, f2) in enumerate(combinations_files):
             for methodology in METHODOLOGIES:
@@ -44,6 +48,7 @@ class ProjectFilesSimilarity:
                 self._scores[methodology.__name__][(f1, f2)] = score
                 self._scores[methodology.__name__][(f2, f1)] = score
 
+        info_logger.info('File similarity scores calculated')
         Cache.store(self._cache_filepath, self._scores)
 
     def get_file_similarity(self, f1, f2, methodology):

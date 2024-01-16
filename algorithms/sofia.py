@@ -3,6 +3,7 @@ from typing import Dict, Set
 
 from models import PullRequest
 from utils import Cache
+from utils.logger import info_logger
 from .base_simulator import BaseSimulator
 from .chrev import ChRev
 from .turnoverRec import TurnoverRec
@@ -40,7 +41,9 @@ class Sofia(BaseSimulator):
         return result
 
     def simulate(self):
+        info_logger.info("Simulating Sofia...")
         if self.cached_result:
+            info_logger.info("Sofia: Using cached result...")
             return self.cached_result
 
         chRev_result = self._chRev_simulator.simulate()
@@ -49,7 +52,9 @@ class Sofia(BaseSimulator):
         # {[pr_number]: { [dev_username]: score }}
         result: Dict[int, Dict[str, float]] = {}
 
+        pr_len = len(self._manager.pull_requests_list)
         for pr in self._manager.pull_requests_list:
+            info_logger.info(f'Calculating candidates for PR {pr.number}/{pr_len}')
             result[pr.number] = {}
             knowledgeable = self._calc_knowledgeable(pr=pr)
             knowledgeable_list = list(knowledgeable.values())
@@ -60,4 +65,5 @@ class Sofia(BaseSimulator):
                     result[pr.number][developer.username] = turnoverRec_result[pr.number][developer.username]
 
         Cache.store(self._cache_filename, result)
+        info_logger.info("Sofia: Simulation finished")
         return result
