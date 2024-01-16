@@ -1,5 +1,5 @@
 
-# Code Recommender
+# Reviewer Recommender
 
 This project uses Python and argparse to run different algorithms on a specified GitHub project. The algorithms are `RevFinder`, `ChRev`, `TurnoverRec`, and `Sofia`.
 
@@ -17,7 +17,7 @@ You need to have Python and pip installed on your machine. You can download Pyth
 cd Github-crawler
 ```
 
-3. Run the crawler commands to fetch the data (see help and usage in the [Github-crawler](https://github.com/Ehsan200/Github-crawler):
+3. Run the crawler commands to fetch the data (see help and usage in the [Github-crawler](https://github.com/Ehsan200/Github-crawler)):
 
 4. Once the data has been fetched, set the `DATA_BASE_DIR` environment variable to the path of the `crawled-data` directory in the `Github-crawler` repository.
 
