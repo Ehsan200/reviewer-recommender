@@ -11,7 +11,6 @@ from .review import Review
 from .review_file import ReviewFile
 
 
-# todo: complete
 class Manager:
     files: Dict[str, File]
     developers: Dict[str, Developer]
@@ -22,7 +21,8 @@ class Manager:
     review_files: List[ReviewFile]
     commits: Dict[str, Commit]
 
-    def __init__(self):
+    def __init__(self, project: str):
+        self.project = project
         self.files = {}
         self.developers = {}
         self.contributions = {}

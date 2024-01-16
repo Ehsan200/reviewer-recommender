@@ -5,3 +5,5 @@ from .comment import Comment
 from .file import File
 from .pull_request import PullRequest
 from .commit import Commit
+from .review import Review
+from .review_file import ReviewFile
