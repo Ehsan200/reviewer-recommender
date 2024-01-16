@@ -33,12 +33,6 @@ export DATA_BASE_DIR=<path-to-Github-crawler>/crawled-data
 cd reviewer-recommender
 ```
 
-7. Install the required Python packages:
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Usage
 
 To run an algorithm on a GitHub project, use the following command:
