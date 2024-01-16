@@ -72,8 +72,8 @@ class RevFinder(BaseSimulator):
         result: Dict[int, Dict[str, float]] = {}
 
         pr_len = len(self._manager.pull_requests_list)
-        for pr in self._manager.pull_requests_list:
-            info_logger.info(f'Calculating candidates for PR {pr.number}/{pr_len}')
+        for index, pr in enumerate(self._manager.pull_requests_list):
+            info_logger.info(f'Calculating candidates: {index + 1}/{pr_len}')
             candidates_per_methodology = list(self.calc_candidates_with_methodologies(pr=pr).values())
 
             # todo: refactor

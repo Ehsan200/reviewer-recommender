@@ -74,8 +74,8 @@ class ChRev(BaseSimulator):
 
         pr_len = len(self._manager.pull_requests_list)
         prev_pr = None
-        for pr in self._manager.pull_requests_list:
-            info_logger.info(f'Calculating candidates for PR {pr.number}/{pr_len}')
+        for index, pr in enumerate(self._manager.pull_requests_list):
+            info_logger.info(f'Calculating candidates: {index + 1}/{pr_len}')
             result[pr.number] = {}
             for developer in self._manager.developers_list:
                 dev_scores = self._calc_xFactor(developer=developer, pr=pr, prev_pr=prev_pr)

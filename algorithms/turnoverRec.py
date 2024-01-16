@@ -78,8 +78,8 @@ class TurnoverRec(BaseSimulator):
         result: Dict[int, Dict[str, float]] = {}
 
         pr_len = len(self._manager.pull_requests_list)
-        for pr in self._manager.pull_requests_list:
-            info_logger.info(f'Calculating candidates for PR {pr.number}/{pr_len}')
+        for index, pr in enumerate(self._manager.pull_requests_list):
+            info_logger.info(f'Calculating candidates: {index + 1}/{pr_len}')
             result[pr.number] = {}
             retentionRec = self._calc_RetentionRec(pr=pr)
             for developer in self._manager.developers_list:
