@@ -1,4 +1,4 @@
-import _pickle as pickle
+import pickle
 import os
 
 CACHE_DIR = '.cache'
