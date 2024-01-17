@@ -1,4 +1,4 @@
-import pickle
+import _pickle as pickle
 import os
 
 CACHE_DIR = '.cache'
@@ -25,4 +25,4 @@ class Cache:
     def store(cls, key, data):
         final_filepath = cls._get_file_location(key)
         with open(final_filepath, 'wb') as f:
-            pickle.dump(data, f)
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
