@@ -90,7 +90,7 @@ class Cache:
 
         os.mkdir(final_filepath)
 
-        for index, chunk in enumerate(cls._chunk_data(converted_data, chunk_size=100000)):
+        for index, chunk in enumerate(cls._chunk_data(converted_data, chunk_size=1000)):
             with open(f'{final_filepath}/{index}', 'wb') as f:
                 pickle.dump(chunk, f, protocol=pickle.HIGHEST_PROTOCOL)
 
