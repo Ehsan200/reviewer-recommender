@@ -88,6 +88,6 @@ class RevFinder(BaseSimulator):
                 for candidate_username in all_unique_candidates_usernames
             }
 
-        Cache.store(self._cache_filename, result)
+        Cache.store(self._cache_filename, result, chunk=True)
         info_logger.info("Simulating RevFinder stored in cache")
         return result

@@ -90,6 +90,6 @@ class ChRev(BaseSimulator):
                 result[pr.number][developer.username] = sum(list(scores[developer.username].values()))
             prev_pr = pr
 
-        Cache.store(self._cache_filename, result)
+        Cache.store(self._cache_filename, result, chunk=True)
         info_logger.info("ChRev simulation stored in cache")
         return result

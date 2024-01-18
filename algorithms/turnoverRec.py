@@ -89,6 +89,6 @@ class TurnoverRec(BaseSimulator):
                     pr=pr
                 ) * retentionRec[developer.username]
 
-        Cache.store(self._cache_filename, result)
+        Cache.store(self._cache_filename, result, chunk=True)
         info_logger.info("TurnoverRec simulation finished")
         return result

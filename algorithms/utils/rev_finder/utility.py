@@ -49,7 +49,7 @@ class ProjectFilesSimilarity:
                 self._scores[methodology.__name__][(f2, f1)] = score
 
         info_logger.info('File similarity scores calculated')
-        Cache.store(self._cache_filepath, self._scores)
+        Cache.store(self._cache_filepath, self._scores, chunk=True)
 
     def get_file_similarity(self, f1, f2, methodology):
         return self._scores[methodology.__name__][(f1, f2)]

@@ -64,6 +64,6 @@ class Sofia(BaseSimulator):
                 else:
                     result[pr.number][developer.username] = turnoverRec_result[pr.number][developer.username]
 
-        Cache.store(self._cache_filename, result)
+        Cache.store(self._cache_filename, result, chunk=True)
         info_logger.info("Sofia: Simulation finished")
         return result
