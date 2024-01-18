@@ -81,21 +81,23 @@ class Cache:
 
         converted_data = []
         if isinstance(data, dict):
+            meta = Meta(dict)
             for key, value in data.items():
                 converted_data.append((key, value))
         elif isinstance(data, list):
+            meta = Meta(list)
             converted_data = data
         else:
             raise Exception('Invalid data type')
 
         os.mkdir(final_filepath)
 
-        for index, chunk in enumerate(cls._chunk_data(converted_data, chunk_size=1000)):
+        for index, chunk in enumerate(cls._chunk_data(converted_data, chunk_size=50 * 1000 * 1000)):
             with open(f'{final_filepath}/{index}', 'wb') as f:
                 pickle.dump(chunk, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         with open(f'{final_filepath}/{Meta.FILE_NAME}', 'wb') as f:
-            pickle.dump(Meta(data_type=type(data)), f, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(meta, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     @classmethod
     def _store(cls, key, data):
