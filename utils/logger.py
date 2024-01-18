@@ -7,7 +7,7 @@ if not os.path.exists(FOLDER_PATH):
     os.makedirs(FOLDER_PATH)
 
 logging.basicConfig(
-    filename=f'{FOLDER_PATH}/{len(os.listdir(FOLDER_PATH))}.info.log',
+    filename=f'{FOLDER_PATH}/{len(os.listdir(FOLDER_PATH)) + 1}.info.log',
     filemode='w',
     format='pid=%(process)d - %(asctime)s - %(message)s',
     datefmt="%Y-%m-%d %H:%M:%S",
