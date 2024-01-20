@@ -1,6 +1,7 @@
 import argparse
 
 from algorithms import Sofia, RevFinder, ChRev, TurnoverRec
+from evaluation import MRR
 from utils import ManagerFactory
 from const import DATA_BASE_DIR
 from utils.logger import info_logger
@@ -21,19 +22,24 @@ parser.add_argument(
 parser.add_argument('--no-cache', action='store_true', help='If set, the cache will not be used.')
 
 
-def run_algorithm(algorithm, args):
+def validate(args):
     if args.r_owner is None or args.r_name is None:
         raise Exception('please provide both owner and name of your repo')
 
     if not DATA_BASE_DIR:
         raise Exception('DATA_BASE_DIR is not set.')
 
+
+def run_algorithm(algorithm, args):
+    validate(args)
     info_logger.info(f'algorithm {args.algorithm} for project={args.r_owner[0]}/{args.r_name[0]} started')
     manager = ManagerFactory(
         DATA_BASE_DIR,
         f'{args.r_owner[0]}-{args.r_name[0]}',
     ).get_manager()
-    algorithm(manager, from_cache=not args.no_cache).simulate()
+    algorithm_instance = algorithm(manager, from_cache=not args.no_cache)
+    if args.evaluate and args.mrr:
+        MRR(manager, algorithm_instance).evaluate()
 
 
 FUNCTION_MAP = {
@@ -44,6 +50,8 @@ FUNCTION_MAP = {
 }
 
 parser.add_argument('algorithm', choices=FUNCTION_MAP.keys(), help='The algorithm to run.')
+parser.add_argument('--evaluate', action='store_true', help='If set, the algorithm will be evaluated.')
+parser.add_argument('--mrr', action='store_true', help='If set, the algorithm will be evaluated with MRR.')
 
 global_args = parser.parse_args()
 func = FUNCTION_MAP[global_args.algorithm]
