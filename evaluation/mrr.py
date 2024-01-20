@@ -10,7 +10,7 @@ class MRR(BaseEvaluation):
         simulation_results = self.get_simulation_results()
         for pr_number, pr_results in simulation_results.items():
             ground_truth = self._get_ground_truth_of_pr(pr_number=pr_number)
-            if len(ground_truth) == 0 or len(pr_results.keys()) == 0:
+            if len(ground_truth) == 0:
                 continue
             total_len += 1
             ranked_list = calc_sorted_candidates(all_candidates=pr_results).keys()
