@@ -49,6 +49,19 @@ If you want to run the project without using cache, add the `--no-cache` argumen
 python manager.py --r_owner <owner> --r_name <repo> <algorithm> --no-cache
 ```
 
+## Evaluation
+
+To evaluate the algorithms, use the following command:
+
+```bash
+python manager.py --r_owner <owner> --r_name <repo> <algorithm> --evaluate --mrr
+```
+
+Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository, and `<algorithm>` with the name of the algorithm you want to run. The available algorithms are `revFinder`, `chRev`, `turnoverRec`, and `sofia`.
+
+`--evaluate` is used to evaluate the algorithm and `--mrr` is used to calculate the Mean Reciprocal Rank (MRR) of the algorithm.
+
+
 ## Data Storage
 
 The data fetched by the `Github-crawler` is stored in the `crawled-data` directory. This directory is located in the root of the `Github-crawler` repository. The data is organized by GitHub project, with each project having its own subdirectory.
