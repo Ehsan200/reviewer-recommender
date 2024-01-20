@@ -1,8 +1,8 @@
 import argparse
 
 from algorithms import Sofia, RevFinder, ChRev, TurnoverRec
-from evaluation import MRR
 from utils import ManagerFactory
+from evaluation import Evaluation
 from const import DATA_BASE_DIR
 from utils.logger import info_logger
 
@@ -37,22 +37,35 @@ def run_algorithm(algorithm, args):
         DATA_BASE_DIR,
         f'{args.r_owner[0]}-{args.r_name[0]}',
     ).get_manager()
-    algorithm_instance = algorithm(manager, from_cache=not args.no_cache)
-    if args.evaluate and args.mrr:
-        MRR(manager, algorithm_instance).evaluate()
+    algorithm(manager, from_cache=not args.no_cache)
+
+
+def run_evaluation(args):
+    validate(args)
+    info_logger.info(f'evaluation for project={args.r_owner[0]}/{args.r_name[0]} started')
+    manager = ManagerFactory(
+        DATA_BASE_DIR,
+        f'{args.r_owner[0]}-{args.r_name[0]}',
+    ).get_manager()
+    simulators = [
+        Sofia(manager, from_cache=not args.no_cache),
+        RevFinder(manager, from_cache=not args.no_cache),
+        ChRev(manager, from_cache=not args.no_cache),
+        TurnoverRec(manager, from_cache=not args.no_cache),
+    ]
+    Evaluation(manager, simulators).evaluate()
 
 
 FUNCTION_MAP = {
-    'revFinder': lambda args: run_algorithm(RevFinder, args),
-    'chRev': lambda args: run_algorithm(ChRev, args),
-    'turnoverRec': lambda args: run_algorithm(TurnoverRec, args),
-    'sofia': lambda args: run_algorithm(Sofia, args),
+    'algo-revFinder': lambda args: run_algorithm(RevFinder, args),
+    'algo-chRev': lambda args: run_algorithm(ChRev, args),
+    'algo-turnoverRec': lambda args: run_algorithm(TurnoverRec, args),
+    'algo-sofia': lambda args: run_algorithm(Sofia, args),
+    'evaluate': lambda args: run_evaluation(args),
 }
 
-parser.add_argument('algorithm', choices=FUNCTION_MAP.keys(), help='The algorithm to run.')
-parser.add_argument('--evaluate', action='store_true', help='If set, the algorithm will be evaluated.')
-parser.add_argument('--mrr', action='store_true', help='If set, the algorithm will be evaluated with MRR.')
+parser.add_argument('command', choices=FUNCTION_MAP.keys(), help='The command to run.')
 
 global_args = parser.parse_args()
-func = FUNCTION_MAP[global_args.algorithm]
+func = FUNCTION_MAP[global_args.command]
 func(global_args)

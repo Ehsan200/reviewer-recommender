@@ -33,12 +33,18 @@ export DATA_BASE_DIR=<path-to-Github-crawler>/crawled-data
 cd reviewer-recommender
 ```
 
+7. Install the required packages:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Usage
 
 To run an algorithm on a GitHub project, use the following command:
 
 ```bash
-python manager.py --r_owner <owner> --r_name <repo> <algorithm>
+python manager.py --r_owner <owner> --r_name <repo> algo-<algorithm>
 ```
 
 Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository, and `<algorithm>` with the name of the algorithm you want to run. The available algorithms are `revFinder`, `chRev`, `turnoverRec`, and `sofia`.
@@ -46,7 +52,7 @@ Replace `<owner>` with the GitHub project owner's username, `<repo>` with the na
 If you want to run the project without using cache, add the `--no-cache` argument:
 
 ```bash
-python manager.py --r_owner <owner> --r_name <repo> <algorithm> --no-cache
+python manager.py --r_owner <owner> --r_name <repo> algo-<algorithm> --no-cache
 ```
 
 ## Evaluation
@@ -54,12 +60,10 @@ python manager.py --r_owner <owner> --r_name <repo> <algorithm> --no-cache
 To evaluate the algorithms, use the following command:
 
 ```bash
-python manager.py --r_owner <owner> --r_name <repo> <algorithm> --evaluate --mrr
+python manager.py evaluate --r_owner <owner> --r_name <repo>
 ```
 
-Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository, and `<algorithm>` with the name of the algorithm you want to run. The available algorithms are `revFinder`, `chRev`, `turnoverRec`, and `sofia`.
-
-`--evaluate` is used to evaluate the algorithm and `--mrr` is used to calculate the Mean Reciprocal Rank (MRR) of the algorithm.
+Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository, and `<algorithm>` with the name of the algorithm you want to run.
 
 
 ## Data Storage
