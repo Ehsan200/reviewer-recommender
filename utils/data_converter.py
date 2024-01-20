@@ -146,7 +146,6 @@ class DataConverter:
         info_logger.info(f'Number of pull requests: {len(all_converted_prs)}')
         info_logger.info(f'Number of review files: {len(all_converted_review_files)}')
 
-
         return dict(
             commits=all_converted_commits,
             developers=all_converted_developers,
