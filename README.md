@@ -63,7 +63,7 @@ To evaluate the algorithms, use the following command:
 python manager.py evaluate --r_owner <owner> --r_name <repo>
 ```
 
-Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository, and `<algorithm>` with the name of the algorithm you want to run.
+Replace `<owner>` with the GitHub project owner's username, `<repo>` with the name of the repository.
 
 
 ## Data Storage
