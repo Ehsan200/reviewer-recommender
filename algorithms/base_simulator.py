@@ -1,7 +1,7 @@
 import abc
 from datetime import datetime
 from functools import cached_property
-from typing import Union, Dict, Type
+from typing import Union, Dict
 
 from models import Manager, PullRequest
 from utils import Cache
@@ -55,5 +55,5 @@ class BaseSimulator:
         return None
 
     @abc.abstractmethod
-    def simulate(self) -> Dict[Type[PullRequest.number], Dict[str, float]]:
+    def simulate(self) -> Dict[int, Dict[str, float]]:
         pass
