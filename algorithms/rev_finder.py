@@ -5,6 +5,7 @@ from typing import Dict, List
 from models import PullRequest, Manager
 from utils import Cache
 from utils.logger import info_logger
+from utils.rank import calc_rank_from_score
 from .base_simulator import BaseSimulator
 from .utils.rev_finder import ProjectFilesSimilarity, METHODOLOGIES
 
@@ -50,14 +51,15 @@ class RevFinder(BaseSimulator):
         return candidates
 
     @staticmethod
-    def calculate_combined_rank(all_candidates: List[Dict[str, float]], candidate: str):
+    def calculate_combined_score(all_candidates: List[Dict[str, float]], candidate: str):
         res = 0
         for list_candidates in all_candidates:
-            if candidate not in list_candidates.keys():
+            candidates = list_candidates.keys()
+            if candidate not in candidates:
                 user_rank = math.inf
             else:
-                user_rank = list_candidates[candidate]
-            res += len(list_candidates.keys()) - user_rank
+                user_rank = calc_rank_from_score(candidate=candidate, all_candidates=list_candidates)
+            res += len(candidates) - user_rank
         return res
 
     def simulate(self):
@@ -68,7 +70,7 @@ class RevFinder(BaseSimulator):
 
         self.file_similarity.calculate_scores()
 
-        # {[pr_number]: { [dev_username]: user_rank }}
+        # {[pr_number]: { [dev_username]: score }}
         result: Dict[int, Dict[str, float]] = {}
 
         pr_len = len(self._manager.pull_requests_list)
@@ -76,15 +78,14 @@ class RevFinder(BaseSimulator):
             info_logger.info(f'Calculating candidates: {index + 1}/{pr_len}')
             candidates_per_methodology = list(self.calc_candidates_with_methodologies(pr=pr).values())
 
-            # todo: refactor
-            all_unique_candidates_usernames = set()
+            all_unique_candidates_usernames = list()
             for candidates_user_scores in candidates_per_methodology:
-                all_unique_candidates_usernames = all_unique_candidates_usernames.union(
-                    set(candidates_user_scores.keys())
-                )
+                all_unique_candidates_usernames += candidates_user_scores.keys()
+
+            all_unique_candidates_usernames = set(all_unique_candidates_usernames)
 
             result[pr.number] = {
-                candidate_username: self.calculate_combined_rank(candidates_per_methodology, candidate_username)
+                candidate_username: self.calculate_combined_score(candidates_per_methodology, candidate_username)
                 for candidate_username in all_unique_candidates_usernames
             }
 
