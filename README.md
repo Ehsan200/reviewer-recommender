@@ -85,6 +85,11 @@ The logs include information such as:
 
 To view the logs, navigate to the `logs` directory and open the desired log file. You can use any text editor to view the contents of the log files.
 
+## Built With
+
+- [Python](https://www.python.org/)
+- [ranx](https://amenra.github.io/ranx/)
+
 ## Authors
 
 - [Ehsan Movaffagh](https://github.com/Ehsan200)
