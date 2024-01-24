@@ -8,10 +8,7 @@ from models import Manager
 class Evaluation:
     _METRICS = [
         'mrr',
-        'ndcg',
-        # todo: Add more
     ]
-    _P_VALUE = 0.01
 
     def __init__(self, manager: Manager, simulators: List[BaseSimulator]):
         self._manager = manager
@@ -23,7 +20,6 @@ class Evaluation:
             runs=self._runs,
             make_comparable=True,
             metrics=self._METRICS,
-            max_p=self._P_VALUE  # P-value threshold
         )
 
         print(report)
